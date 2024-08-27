@@ -2,26 +2,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import streamlit as st
 
-pages = {
-    "SQL AI":"home",
-    "SQL Query Generator":"query_gen",
-    "Execute Query":"exec_query",
-    "Connnect Database":"database"
-}
-
-def extract_sql(response):
-    data = response.text
-    if "sql" not in data:
-        return 400
-    sqlStartIndex = data.find("```sql")
-    sqlEndIndex = data.find("```",sqlStartIndex+6)
-
-    if sqlEndIndex==-1 or sqlEndIndex==-1:
-        return ""
-    sql_query = data[sqlStartIndex+6:sqlEndIndex]
-
-    return sql_query
-
+#Initialize model when LLM API key is provided
+@st.cache_resource # avoids re-initializing the model everytime a page loads
 def init_model(api_key):
     genai.configure(api_key=api_key)
 
@@ -40,6 +22,7 @@ def init_model(api_key):
 
     return model
 
+# Extract the Latest SQL query from the model response
 def extract_sql(response):
     data = response.text
     sqlStartIndex = data.find("```sql")
@@ -49,10 +32,10 @@ def extract_sql(response):
 
     return sql_query
 
-def execute_sql_page():
+def execute_sql():
     pass
 
-def connect_db_page():
+def connect_db(db_details):
     pass
 
 def home():

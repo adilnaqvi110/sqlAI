@@ -1,13 +1,6 @@
 import streamlit as st
 import time
 
-# homePage = st.Page("Home.py",title="Home",default=True,icon=":material/home:")
-# sqlAIPage = st.Page("src/Generate_SQL_Query.py",title="Generate Query",url_path="gen-query",icon=":material/build:")
-# pages = [homePage,sqlAIPage]
-# pg = st.navigation(pages)
-# if pg.title.strip()!="Home":
-#     st.switch_page(pg)
-
 with st.sidebar:
     st.sidebar.title("SQL AI 🤖")
     "[View the source code](https://github.com/streamlit/llm-examples/blob/main/Chatbot.py)"
@@ -23,9 +16,6 @@ and let the AI do the rest!
 
 st.header("To Get Started")
 st.write("Make sure you already have an API key for your Google GEMINI model")
-
-if "api_key_value" not in st.session_state:
-    st.session_state["api_key_value"]=""
 
 api_key_value = st.text_input(label="Enter your API key here:",type="password",placeholder="Press enter to register API key")
 
