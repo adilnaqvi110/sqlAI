@@ -2,6 +2,7 @@ import streamlit as st
 from views import init_model,extract_sql
 from dotenv import load_dotenv
 import os
+import streamlit_shadcn_ui as ui
 
 load_dotenv()
 
@@ -9,7 +10,7 @@ with st.sidebar:
     # api_key = st.text_input(placeholder="Enter your API key here",label="", type="password")
     # st.caption("Note: Right now the chat window disappersif pagesare switched, reneter API key to get it back")
     reset_chat = st.button("Reset Chat",key="reset_chat_button")
-    st.title("How to use SQL AI")
+    st.title("How to use SQL AI",anchor=False)
     st.write("""
 1. **Generate SQL Query**: In the SQL Generator chatbox, type your required SQL query in natural language.
 2. **Output SQL Query**: The AI model generates an SQL as per your input.
@@ -24,7 +25,7 @@ if st.session_state["api_key_value"]=="":
 # api_key = os.getenv("GEMINI_API_KEY")
 if "api_key_value" in st.session_state and st.session_state["api_key_value"]!="":
     model = init_model(st.session_state["api_key_value"])
-    st.title("💬 Chatbot")
+    st.title("💬 Chatbot",anchor=False)
     st.caption("🚀 A SQL query generator powered by Gemini")
     if "messages" not in st.session_state:
         st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
