@@ -1,4 +1,6 @@
 import streamlit as st
+import sqlite3
+import pandas as pd
 
 # Main function to create the page
 st.title("Connect to a Database 🗄️",anchor=False)
@@ -14,14 +16,15 @@ databases = [
     {"name": "SQL Server", "type": "sqlserver"}
 ]
 
-db = ["Postgres","SQLite3","MongoDB"]
+db_types = ["PostgreSQL","SQLite3","MySQL"]
 
 left_col,right_col = st.columns([0.22,0.78])
 with left_col:
-    selected_db = st.selectbox(options=db,label="Select a Database:")
+    selected_db = st.selectbox(options=db_types,label="Select a Database:")
 
 with right_col:
-    if selected_db in ["Postgres", "SQLite3", "sqlserver"]:
+    if selected_db in ["PostgreSQL","MySQL"]:
+        st.warning("In development..(Try SQLite3)")
         col1,col2 = st.columns([0.5,0.5])
         with col1:
             host = st.text_input("Host:")
@@ -31,9 +34,21 @@ with right_col:
             username = st.text_input("Username:")
         password = st.text_input("Password:", type="password")
 
-    elif selected_db == "SQLite":
-        filepath = st.text_input("Database File Path:")
-
-    elif selected_db == "MongoDB":
-        connection_uri = st.text_input("Connection URI:")
+    elif selected_db == "SQLite3":
+        uploaded_file = st.file_uploader("Upload your SQLite database", type=["sqlite", "db","sqlite3"])
+        if uploaded_file is not None:
+            with open("data/temp_database.db", "wb") as f:
+                f.write(uploaded_file.read())
+            
+            # Connect to the database
+            conn = sqlite3.connect("temp_database.db")
+            
+            # Get the table names
+            tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table';", conn)
+            st.write("Tables in the database:", tables)
+            
+            # Close the connection
+            conn.close()
+    else:
+        print("Selected database not available")
         

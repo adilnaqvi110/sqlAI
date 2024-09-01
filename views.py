@@ -1,6 +1,8 @@
 import google.generativeai as genai
 from dotenv import load_dotenv
 import streamlit as st
+import sqlite3
+import pandas as pd
 
 #Initialize model when LLM API key is provided
 @st.cache_resource # avoids re-initializing the model everytime a page loads
@@ -28,12 +30,46 @@ def extract_sql(response):
     sqlStartIndex = data.find("```sql")
     sqlEndIndex = data.find("```",sqlStartIndex+6)
 
-    sql_query = data[sqlStartIndex+6:sqlEndIndex]
-
+    if sqlStartIndex!=-1 and sqlEndIndex!=-1:
+        sql_query = data[sqlStartIndex+6:sqlEndIndex]
+    else:
+        return 400
+    
     return sql_query
 
-def execute_sql():
-    pass
+def execute_sql_query(db_path: str, query: str):
+    """
+    Executes an SQL query on the specified SQLite database.
 
-def connect_db(db_details):
-    pass
+    Parameters:
+    db_path (str): Path to the SQLite database file.
+    query (str): The SQL query to execute.
+
+    Returns:
+    pd.DataFrame: DataFrame containing results if the query is a SELECT statement.
+    str: Success or error message if the query is an action query (INSERT, UPDATE, DELETE, etc.).
+    """
+    try:
+        # Connect to the database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Determine the type of query (SELECT or action query)
+
+        if "SELECT".lower() in query:
+            # If the query is a SELECT statement, return the results as a DataFrame
+            df = pd.read_sql(query, conn)
+            print(df)
+            return df
+        else:
+            # If the query is an action query, execute it
+            cursor.execute(query)
+            conn.commit()
+            print("Query executed successfully!")
+            return None
+    except sqlite3.Error as e:
+        # If there is an error, return the error message
+        print(f"An error occurred: {e}")
+    finally:
+        # Close the database connection
+        conn.close()

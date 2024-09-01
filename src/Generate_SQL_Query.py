@@ -3,6 +3,7 @@ from views import init_model,extract_sql
 from dotenv import load_dotenv
 import os
 import streamlit_shadcn_ui as ui
+import time
 
 load_dotenv()
 
@@ -19,8 +20,17 @@ with st.sidebar:
 """)
     
 if st.session_state["api_key_value"]=="":
+    st.title("💬 Chatbot",anchor=False)
+    st.caption("🚀 A SQL query generator powered by Gemini")
     st.warning("API key not initialized")
-    st.caption("Tip: Visit the Home page and enter the API key for your model")
+
+    api_key_value = st.text_input(label="Enter your API key here:",type="password",placeholder="Press enter to register API key")
+    if st.button(label="Connect"):
+        st.session_state["api_key_value"]=api_key_value
+        with st.spinner("Connecting model"):
+            st.success("Model connected")
+        st.rerun()
+    st.caption("Tip: To initialize your model, enter the Gemini API key and press enter")
 
 # api_key = os.getenv("GEMINI_API_KEY")
 if "api_key_value" in st.session_state and st.session_state["api_key_value"]!="":
@@ -44,7 +54,7 @@ if "api_key_value" in st.session_state and st.session_state["api_key_value"]!=""
             sql_query = extract_sql(response)
             print(sql_query)
             if sql_query==400:
-                msg = "You have not entered any question regarding an SQL query, please ask me questions only regarding a query that you want to generate :)"
+                msg = "You have not entered any question regarding an SQL query, please ask me questions only regarding an SQL query that you want to generate :)"
                 st.session_state.messages.append({"role": "assistant", "content": msg})
                 st.chat_message("assistant").write(msg)
             else:
